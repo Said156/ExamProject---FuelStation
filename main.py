@@ -1,7 +1,6 @@
 import customtkinter as ctk
 from functions import fuel_prices, cafe_prices, update_total
 
-# --- Əsas Pəncərə ---
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
@@ -10,14 +9,13 @@ root.title("⛽ Fuel Station & Mini Cafe ☕")
 root.geometry("520x650")
 root.resizable(False, False)
 
-# --- Header ---
+
 header = ctk.CTkFrame(root, height=80, fg_color="#2ECC71", corner_radius=20)
 header.pack(fill="x", pady=10, padx=10)
 title = ctk.CTkLabel(header, text="⛽ Fuel Station & Mini Cafe ☕",
                      font=("Arial Rounded MT Bold", 24), text_color="white")
 title.place(relx=0.5, rely=0.5, anchor="center")
 
-# --- Content ---
 content = ctk.CTkFrame(root, corner_radius=15, fg_color="#34495E")
 content.pack(fill="both", expand=True, padx=15, pady=10)
 
