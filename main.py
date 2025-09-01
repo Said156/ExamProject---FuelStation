@@ -1,81 +1,79 @@
+
 import customtkinter as ctk
-from functions import fuel_prices, cafe_prices, update_total
+from functions import fuel_prices, cafe_prices, hesabla_yanacaq, hesabla_cafe, yekun_hesabla
+
+# Əsas Pəncərə
+app = ctk.CTk()
+app.title("⛽ Fuel Station & ☕ Mini Cafe")
+app.geometry("650x450")
+app.resizable(False, False)
 
 ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("dark-blue")
+ctk.set_default_color_theme("blue")
 
-root = ctk.CTk()
-root.title("⛽ Fuel Station & Mini Cafe ☕")
-root.geometry("520x650")
-root.resizable(False, False)
+# Yanacaq Frame
+frame_fuel = ctk.CTkFrame(app, corner_radius=12)
+frame_fuel.grid(row=0, column=0, padx=15, pady=15, sticky="n")
 
+label_fuel = ctk.CTkLabel(frame_fuel, text="⛽ Yanacaq Seçimi", font=("Arial", 16, "bold"))
+label_fuel.pack(pady=(10, 5))
 
-header = ctk.CTkFrame(root, height=80, fg_color="#2ECC71", corner_radius=20)
-header.pack(fill="x", pady=10, padx=10)
-title = ctk.CTkLabel(header, text="⛽ Fuel Station & Mini Cafe ☕",
-                     font=("Arial Rounded MT Bold", 24), text_color="white")
-title.place(relx=0.5, rely=0.5, anchor="center")
+fuel_var = ctk.StringVar(value="Petrol")
+fuel_menu = ctk.CTkOptionMenu(frame_fuel, values=list(fuel_prices.keys()), variable=fuel_var, width=180)
+fuel_menu.pack(pady=5)
 
-content = ctk.CTkFrame(root, corner_radius=15, fg_color="#34495E")
-content.pack(fill="both", expand=True, padx=15, pady=10)
+label_litr = ctk.CTkLabel(frame_fuel, text="Litrlə daxil edin:", font=("Arial", 13))
+label_litr.pack()
 
-# --- Fuel Station Frame ---
-fuel_frame = ctk.CTkFrame(content, corner_radius=15, fg_color="#1ABC9C")
-fuel_frame.pack(fill="x", padx=15, pady=10)
+entry_litr = ctk.CTkEntry(frame_fuel, placeholder_text="Miqdar (L)", width=150)
+entry_litr.pack(pady=5)
 
-ctk.CTkLabel(fuel_frame, text="Fuel Station", font=("Arial", 16, "bold")).pack(anchor="w", padx=10, pady=(10,5))
+fuel_result = ctk.CTkLabel(frame_fuel, text="Qiymət: 0 AZN", font=("Arial", 14, "bold"))
+fuel_result.pack(pady=5)
 
-fuel_type = ctk.StringVar(value="Petrol")
-combo_fuel = ctk.CTkComboBox(fuel_frame, values=list(fuel_prices.keys()), variable=fuel_type, width=180)
-combo_fuel.pack(padx=10, pady=5)
+btn_calc_fuel = ctk.CTkButton(frame_fuel, text="Hesabla", width=150,
+    command=lambda: hesabla_yanacaq(entry_litr, fuel_var, fuel_result))
+btn_calc_fuel.pack(pady=(5, 10))
 
-ctk.CTkLabel(fuel_frame, text="Liters:", font=("Arial", 12)).pack(anchor="w", padx=10)
-liters_var = ctk.DoubleVar(value=0)
-slider = ctk.CTkSlider(fuel_frame, from_=0, to=100, variable=liters_var, number_of_steps=100)
-slider.pack(pady=5, padx=10, fill="x")
+# Kafe Frame
+frame_cafe = ctk.CTkFrame(app, corner_radius=12)
+frame_cafe.grid(row=0, column=1, padx=15, pady=15, sticky="n")
 
-liters_label = ctk.CTkLabel(fuel_frame, text="0 Liters", font=("Arial", 12))
-liters_label.pack(anchor="w", padx=10, pady=(0,10))
+label_cafe = ctk.CTkLabel(frame_cafe, text="☕ Mini Cafe", font=("Arial", 16, "bold"))
+label_cafe.pack(pady=(10, 5))
 
-# --- Mini Cafe Frame ---
-cafe_frame = ctk.CTkFrame(content, corner_radius=15, fg_color="#E67E22")
-cafe_frame.pack(fill="x", padx=15, pady=10)
+cafe_entries = {}
+for item, price in cafe_prices.items():
+    row = ctk.CTkFrame(frame_cafe)
+    row.pack(fill="x", pady=3, padx=10)
+    
+    lbl = ctk.CTkLabel(row, text=f"{item} - {price:.2f} AZN", font=("Arial", 13))
+    lbl.pack(side="left")
+    
+    ent = ctk.CTkEntry(row, placeholder_text="0", width=50)
+    ent.pack(side="right")
+    
+    cafe_entries[item] = (ent, price)
 
-ctk.CTkLabel(cafe_frame, text="Mini Cafe", font=("Arial", 16, "bold")).pack(anchor="w", padx=10, pady=(10,5))
+cafe_result = ctk.CTkLabel(frame_cafe, text="Ümumi: 0 AZN", font=("Arial", 14, "bold"))
+cafe_result.pack(pady=5)
 
-cafe_widgets = {}
-for item in cafe_prices.keys():
-    row = ctk.CTkFrame(cafe_frame, fg_color="#F39C12", corner_radius=10)
-    row.pack(fill="x", padx=10, pady=5)
+btn_calc_cafe = ctk.CTkButton(frame_cafe, text="Hesabla", width=150,
+    command=lambda: hesabla_cafe(cafe_entries, cafe_result))
+btn_calc_cafe.pack(pady=(5, 10))
 
-    chk_var = ctk.IntVar(value=0)
-    chk = ctk.CTkCheckBox(row, text=item, variable=chk_var)
-    chk.pack(side="left", padx=10, pady=5)
+# Yekun Frame
+frame_total = ctk.CTkFrame(app, corner_radius=12)
+frame_total.grid(row=1, column=0, columnspan=2, pady=15)
 
-    spin = ctk.CTkEntry(row, width=50)
-    spin.insert(0, "0")
-    spin.pack(side="right", padx=10, pady=5)
+label_total = ctk.CTkLabel(frame_total, text="💰 Yekun Ödəniş", font=("Arial", 18, "bold"))
+label_total.pack(pady=(10, 5))
 
-    cafe_widgets[item] = (chk_var, spin)
+final_result = ctk.CTkLabel(frame_total, text="0 AZN", font=("Arial", 20, "bold"), text_color="yellow")
+final_result.pack()
 
-# --- Result Frame ---
-result_frame = ctk.CTkFrame(root, corner_radius=15, fg_color="#3498DB")
-result_frame.pack(fill="x", padx=15, pady=15)
+btn_total = ctk.CTkButton(frame_total, text="Yekun Hesabla", width=200, height=35,
+    command=lambda: yekun_hesabla(entry_litr, fuel_var, cafe_entries, final_result))
+btn_total.pack(pady=(10, 15))
 
-label_result = ctk.CTkLabel(result_frame, text="Total Price: $0.00", font=("Arial", 20, "bold"))
-label_result.pack(pady=15)
-
-# --- Trace və Bind ---
-liters_var.trace("w", lambda *args: update_total(liters_var, liters_label, fuel_type, cafe_widgets, label_result))
-fuel_type.trace("w", lambda *args: update_total(liters_var, liters_label, fuel_type, cafe_widgets, label_result))
-
-for item, (chk_var, spin) in cafe_widgets.items():
-    chk_var.trace("w", lambda *args, lv=liters_var, ll=liters_label, ft=fuel_type, cw=cafe_widgets, lr=label_result:
-                  update_total(lv, ll, ft, cw, lr))
-    spin.bind("<KeyRelease>", lambda e, lv=liters_var, ll=liters_label, ft=fuel_type, cw=cafe_widgets, lr=label_result:
-              update_total(lv, ll, ft, cw, lr))
-
-# --- İlk yeniləmə ---
-update_total(liters_var, liters_label, fuel_type, cafe_widgets, label_result)
-
-root.mainloop()
+app.mainloop()
